@@ -1,4 +1,5 @@
 import bigram_diagram.BigramMapper;
+import bigram_diagram.BigramReducer;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -15,6 +16,7 @@ public class LetterFrequenties {
 
         job.setJarByClass(LetterFrequenties.class);
         job.setMapperClass(BigramMapper.class);
+        job.setReducerClass(BigramReducer.class);
 
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
