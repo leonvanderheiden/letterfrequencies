@@ -1,4 +1,4 @@
-package bigram_diagram;
+package firstletter;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;
@@ -6,7 +6,7 @@ import org.apache.hadoop.mapreduce.Reducer;
 
 import java.io.IOException;
 
-public class BigramReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
+public class FirstLetterReducer extends Reducer<Text, IntWritable, Text, IntWritable> {
     public void reduce(Text key, Iterable<IntWritable> values, Context context) throws IOException, InterruptedException {
         int sum = 0;
         for (IntWritable value : values) {
