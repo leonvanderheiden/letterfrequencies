@@ -20,9 +20,9 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-//        bigramJob(args);
-//        firstLetterJob();
-//        scoreJob();
+        bigramJob(args);
+        firstLetterJob();
+        scoreJob();
         maxEntropyModelJob();
     }
 
@@ -91,7 +91,7 @@ public class Main {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(DoubleWritable.class);
 
-        SequenceFileInputFormat.setInputPaths(job, new Path("models/engels"), new Path("models/nederlands"), new Path("output/score_output"));
+        SequenceFileInputFormat.setInputPaths(job, new Path("output/score_output"), new Path("models/engels"), new Path("models/nederlands"));
         FileOutputFormat.setOutputPath(job, new Path("output/maxentropymodel_output"));
 
         job.setInputFormatClass(TextInputFormat.class);
