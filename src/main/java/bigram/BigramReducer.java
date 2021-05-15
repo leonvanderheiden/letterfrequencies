@@ -1,4 +1,4 @@
-package bigram_diagram;
+package bigram;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.Text;

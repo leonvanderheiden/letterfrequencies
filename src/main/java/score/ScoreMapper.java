@@ -1,16 +1,16 @@
-package percentageBigram;
+package score;
 
 import org.apache.hadoop.io.DoubleWritable;
-import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 import java.io.IOException;
+import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
 
-public class PercentageBigramMapper extends Mapper<LongWritable, Text, Text, DoubleWritable> {
+public class ScoreMapper extends Mapper<LongWritable, Text, Text, DoubleWritable> {
     static Map<String, Double> bigramMap = new HashMap<>();
     static Map<String, Double> letterFrequencyMap = new HashMap<>();
 
@@ -28,12 +28,14 @@ public class PercentageBigramMapper extends Mapper<LongWritable, Text, Text, Dou
             }
         }
 
+        DecimalFormat df = new DecimalFormat("#.##");
+
         for (Map.Entry<String, Double> bigram : bigramMap.entrySet()) {
             for (Map.Entry<String, Double> totalLetters : letterFrequencyMap.entrySet()) {
                 if (bigram.getKey().charAt(0) == totalLetters.getKey().charAt(0)) {
                     double perc = bigram.getValue() / totalLetters.getValue();
-
-                    context.write(new Text(bigram.getKey()), new DoubleWritable(perc));
+                    String round = df.format(perc).replace(',', '.');
+                    context.write(new Text(bigram.getKey()), new DoubleWritable(Double.valueOf(round)));
                 }
             }
         }

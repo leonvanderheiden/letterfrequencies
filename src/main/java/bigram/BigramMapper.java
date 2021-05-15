@@ -1,4 +1,4 @@
-package bigram_diagram;
+package bigram;
 
 import org.apache.hadoop.io.IntWritable;
 import org.apache.hadoop.io.LongWritable;
@@ -10,7 +10,7 @@ import java.io.IOException;
 public class BigramMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
     public void map(LongWritable Key, Text value, Context context) throws IOException, InterruptedException {
 
-        String[] tokens = value.toString().split("[^a-zA-Z]");
+        String[] tokens = value.toString().toLowerCase().split("[^a-zA-Z]");
 
         for (String s : tokens)
         {

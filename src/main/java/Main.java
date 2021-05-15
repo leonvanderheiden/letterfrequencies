@@ -1,5 +1,5 @@
-import bigram_diagram.BigramMapper;
-import bigram_diagram.BigramReducer;
+import bigram.BigramMapper;
+import bigram.BigramReducer;
 import firstletter.FirstLetterMapper;
 import firstletter.FirstLetterReducer;
 import org.apache.hadoop.conf.Configuration;
@@ -12,13 +12,19 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.SequenceFileInputFormat;
 import org.apache.hadoop.mapreduce.lib.input.TextInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
-import percentageBigram.PercentageBigramMapper;
-import percentageBigram.PercentageBigramReducer;
+import score.ScoreMapper;
+import score.ScoreReducer;
 
 import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) throws Exception {
+        bigramJob(args);
+        firstLetterJob();
+        scoreJob();
+    }
+
+    public static void bigramJob(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
         Job job = new Job(conf, "Bigram");
 
@@ -30,13 +36,10 @@ public class Main {
         job.setOutputValueClass(IntWritable.class);
 
         FileInputFormat.addInputPath(job, new Path(args[0]));
-        FileOutputFormat.setOutputPath(job, new Path("Bigram_output"));
+        FileOutputFormat.setOutputPath(job, new Path("output/bigram_output"));
 
         job.setInputFormatClass(TextInputFormat.class);
         job.waitForCompletion(true);
-        firstLetterJob();
-        percentageBigramJob();
-
     }
 
     public static void firstLetterJob() throws IOException, ClassNotFoundException, InterruptedException {
@@ -50,26 +53,26 @@ public class Main {
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(IntWritable.class);
 
-        FileInputFormat.addInputPath(job, new Path("Bigram_output"));
-        FileOutputFormat.setOutputPath(job, new Path("FirstLetter_output"));
+        FileInputFormat.addInputPath(job, new Path("output/bigram_output"));
+        FileOutputFormat.setOutputPath(job, new Path("output/firstletter_output"));
 
         job.setInputFormatClass(TextInputFormat.class);
         job.waitForCompletion(true);
     }
 
-    public static void percentageBigramJob() throws IOException, ClassNotFoundException, InterruptedException {
+    public static void scoreJob() throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
-        Job job = new Job(conf, "PercentageBigram");
+        Job job = new Job(conf, "Score");
 
         job.setJarByClass(Main.class);
-        job.setMapperClass(PercentageBigramMapper.class);
-        job.setReducerClass(PercentageBigramReducer.class);
+        job.setMapperClass(ScoreMapper.class);
+        job.setReducerClass(ScoreReducer.class);
 
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(DoubleWritable.class);
 
-        SequenceFileInputFormat.setInputPaths(job, new Path("Bigram_output"), new Path("Firstletter_output"));
-        FileOutputFormat.setOutputPath(job, new Path("PercentageBigram_output"));
+        SequenceFileInputFormat.setInputPaths(job, new Path("output/bigram_output"), new Path("output/firstletter_output"));
+        FileOutputFormat.setOutputPath(job, new Path("output/score_output"));
 
         job.setInputFormatClass(TextInputFormat.class);
         job.waitForCompletion(true);
