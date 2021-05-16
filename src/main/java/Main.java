@@ -3,7 +3,9 @@ import bigram.BigramReducer;
 import firstletter.FirstLetterMapper;
 import firstletter.FirstLetterReducer;
 import maxEntropyModel.MaxEntropyModelMapper;
+import maxEntropyModel.MaxEntropyModelReducer;
 import org.apache.hadoop.conf.Configuration;
+import org.apache.hadoop.fs.FileSystem;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.DoubleWritable;
 import org.apache.hadoop.io.IntWritable;
@@ -23,7 +25,7 @@ public class Main {
         bigramJob(args);
         firstLetterJob();
         scoreJob();
-        maxEntropyModelJob();
+        maxEntropyModelJob(args);
     }
 
     public static void bigramJob(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
@@ -80,22 +82,26 @@ public class Main {
         job.waitForCompletion(true);
     }
 
-    public static void maxEntropyModelJob() throws IOException, ClassNotFoundException, InterruptedException {
+    public static void maxEntropyModelJob(String[] args) throws IOException, ClassNotFoundException, InterruptedException {
         Configuration conf = new Configuration();
         Job job = new Job(conf, "MaxEntropyModel");
 
         job.setJarByClass(Main.class);
         job.setMapperClass(MaxEntropyModelMapper.class);
-        //job.setReducerClass(ScoreReducer.class);
+        job.setReducerClass(MaxEntropyModelReducer.class);
 
         job.setOutputKeyClass(Text.class);
         job.setOutputValueClass(DoubleWritable.class);
 
         SequenceFileInputFormat.setInputPaths(job, new Path("output/score_output"), new Path("models/engels"), new Path("models/nederlands"));
-        FileOutputFormat.setOutputPath(job, new Path("output/maxentropymodel_output"));
+        FileOutputFormat.setOutputPath(job, new Path(args[1]));
 
         job.setInputFormatClass(TextInputFormat.class);
         job.waitForCompletion(true);
+
+        FileSystem fileSystem = FileSystem.get(conf);
+        fileSystem.delete(new Path("output"), true);
+
     }
 }
 

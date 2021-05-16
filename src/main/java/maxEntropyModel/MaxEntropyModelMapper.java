@@ -11,14 +11,14 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MaxEntropyModelMapper extends Mapper<LongWritable, Text, Text, IntWritable> {
+public class MaxEntropyModelMapper extends Mapper<LongWritable, Text, Text, DoubleWritable> {
     static Map<String, Double> scoreMap = new HashMap<>();
     static Map<String, Double> engelsMap = new HashMap<>();
     static Map<String, Double> nederlandsMap = new HashMap<>();
 
     public void map(LongWritable Key, Text value, Context context) throws IOException, InterruptedException {
-        float engelsScore = 0;
-        float nederlandsScore = 0;
+        double engelsScore = 0;
+        double nederlandsScore = 0;
 
         String[] lines = value.toString().split("\n");
         for (String line : lines) {
@@ -44,6 +44,12 @@ public class MaxEntropyModelMapper extends Mapper<LongWritable, Text, Text, IntW
                 if (score.getKey().equals(nederlands.getKey())) {
                     nederlandsScore += score.getValue() * nederlands.getValue();
                 }
+            }
+            if(nederlandsScore < engelsScore){
+                context.write(new Text("Engels"), new DoubleWritable(engelsScore));
+            }
+            else {
+                context.write(new Text("Nederlands"), new DoubleWritable(nederlandsScore));
             }
         }
 
